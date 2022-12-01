@@ -12,7 +12,7 @@ parser.add_argument(
     "--number",
     type=int,
     default=1,
-    help="Number of identies generated (default is 1)",
+    help="Number of identities generated (default is 1)",
 )
 args = parser.parse_args()
 

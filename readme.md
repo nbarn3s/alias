@@ -7,21 +7,20 @@ https://www.ssa.gov/OACT/babynames/decades/names1980s.html
 https://www.ssa.gov/OACT/babynames/decades/names1990s.html
 
 This was written for personal amusement.  It would be easy to expand the functionality, submit an issue if you would like to see something added or changed.
-If you want something quicker than cloning this project: https://www.fakenamegenerator.com/
+If you want something quicker/easier than cloning this project, this web service seems well recommended: https://www.fakenamegenerator.com/
 
 ## Usage
+    usage: alias [-h] -a AGE [-f] [-m] [-n NUMBER]
 
-usage: alias [-h] -a AGE [-f] [-m] [-n NUMBER]
+    Generates a random name
 
-Generates a random name
-
-options:
-  -h, --help            show this help message and exit
-  -a AGE, --age AGE     The person's age
-  -f, --female          Choose a female name
-  -m, --male            Choose a male name
-  -n NUMBER, --number NUMBER
-                        Number of identies generated (default is 1)
+    options:
+    -h, --help            show this help message and exit
+    -a AGE, --age AGE     The person's age
+    -f, --female          Choose a female name
+    -m, --male            Choose a male name
+    -n NUMBER, --number NUMBER
+                            Number of identities generated (default is 1)
 
 ## Examples
     > python -m alias -ma 25
