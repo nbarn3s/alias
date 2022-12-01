@@ -7,6 +7,10 @@ import datetime
 import math
 import os
 import random
+import string
+
+MIN_USA_FORENAME_DECADE = 1880
+MAX_USA_FORENAME_DECADE = 2010
 
 
 class Identity(object):
@@ -21,24 +25,46 @@ class Identity(object):
             )
         self.age = int(age)
         self.birthday = None
-        self.forname = None
+        self.forename = None
+        self.middleName = None
         self.surname = None
         self.mothersMaidenName = None
+        self.homeState = None
         self.rollIdentity()
 
     def printInfo(self):
+        if self.gender == "MALE":
+            subjectivePronoun = "his"
+            objectivePronoun = "he"
+        else:
+            subjectivePronoun = "her"
+            objectivePronoun = "she"
         print(
-            f"{self.forname} {self.surname}, a {self.age}-year-old {self.gender.lower()} born on {self.birthday} (YYYY-MM-DD)."
+            f"{self.forename} {self.middleName[0]}. {self.surname}, a {self.age}-year-old {self.gender.lower()} born on {self.birthday} (YYYY-MM-DD)."
         )
-        print(f"\tMother's maiden name is: {self.mothersMaidenName}")
+        print(
+            f"\t{self.forename}'s mother's maiden name is {self.mothersMaidenName}, and {objectivePronoun} is from {self.homeState}."
+        )
+        if self.namesake:
+            print(
+                f"\t{string.capwords(subjectivePronoun)} middle name is {self.middleName}, named for {subjectivePronoun} {self.namesake}."
+            )
+        else:
+            print(
+                f"\t{string.capwords(subjectivePronoun)} middle name is {self.middleName}."
+            )
 
     def rollIdentity(self):
         self.birthday = rollBirthDay(self.age)
-        self.forname = rollForename(self.birthday.year, self.nationality, self.gender)
+        self.forename = rollForename(self.birthday.year, self.nationality, self.gender)
+        self.middleName, self.namesake = rollMiddleName(
+            self.birthday.year, self.nationality, self.gender
+        )
         self.surname = rollSurname(self.nationality)
         self.mothersMaidenName = self.surname
         while self.surname == self.mothersMaidenName:
             self.mothersMaidenName = rollSurname(self.nationality)
+        self.homeState = rollState(self.nationality)
 
 
 def rollBirthDay(age):
@@ -95,17 +121,41 @@ def rollForename(birthYear, nationality, gender):
                 numbers.append(number)
 
     accum = 0.0
-    forname = None
+    forename = None
     rollFore = random.random()
     for (name, number) in zip(
         names,
         numbers,
     ):
         accum += number / total
-        if not forname and accum > rollFore:
-            forname = name
+        if not forename and accum > rollFore:
+            forename = name
 
-    return forname
+    return forename
+
+
+def rollMiddleName(birthYear, nationality, gender):
+    birthDecade = 10 * math.floor(birthYear / 10.0)
+    pDecade = birthDecade - 20  # parent decade
+    gpDecade = pDecade - 20  # grandparent decade
+    ggpDecade = gpDecade - 20  # great-grandparent decade
+    if gender == "MALE":
+        root = "father"
+    else:
+        root = "mother"
+    if ggpDecade >= MIN_USA_FORENAME_DECADE:
+        namesake = f"great-grand{root}"
+        middleName = rollForename(ggpDecade, nationality, gender)
+    elif gpDecade >= MIN_USA_FORENAME_DECADE:
+        namesake = f"grand{root}"
+        middleName = rollForename(gpDecade, nationality, gender)
+    elif pDecade >= MIN_USA_FORENAME_DECADE:
+        namesake = root
+        middleName = rollForename(pDecade, nationality, gender)
+    else:
+        namesake = None
+        middleName = rollForename(birthDecade, nationality, gender)
+    return middleName, namesake
 
 
 def rollSurname(nationality):
@@ -146,3 +196,43 @@ def rollSurname(nationality):
             surname = sName
             break
     return surname
+
+
+def rollState(nationality):
+    """Generate a random state given a nationality
+    Currently the only nationality supported is USA
+    """
+    if nationality not in ("USA"):
+        raise ValueError("Only rollState only supports a nationality value of 'USA'")
+    filePath = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        f"data_{nationality}",
+        "states.csv",
+    )
+    if not os.path.isfile(filePath):
+        raise ValueError(f"The file: {filePath} does not exist.")
+    with open(filePath) as csv_file:
+        states = []
+        numbers = []
+        total = 0
+        data = csv.reader(csv_file, delimiter=",", quotechar='"')
+        for line in data:
+            if len(line) < 3:
+                continue
+            try:
+                number = float(line[2])
+            except ValueError:
+                continue
+            states.append(line[1])
+            total += number
+            numbers.append(number)
+
+    accum = 0.0
+    homeState = None
+    rollState = random.random()
+    for (state, number) in zip(states, numbers):
+        accum += number / total
+        if accum > rollState:
+            homeState = state
+            break
+    return homeState
