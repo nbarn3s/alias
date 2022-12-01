@@ -2,12 +2,13 @@
 Generate a random name based on the proportion of the population with that forename and surname. The data is USA based, with the surname data from:
 https://en.wikipedia.org/wiki/List_of_most_common_surnames_in_North_America#United_States_(American)
 
-The forename is based on the age of the identity so the most popular child names in the decade the person would have been born is used.  These are the sources:
+The forename is randomly generated based on the proportional popularity of the child names in the decade the person would have been born.  These are the sources:
 https://www.ssa.gov/OACT/babynames/decades/names1980s.html
 https://www.ssa.gov/OACT/babynames/decades/names1990s.html
 
-This was written for personal amusement.  It would be easy to expand the functionality, submit an issue if you would like to see something added or changed.
-If you want something quicker/easier than cloning this project, this web service seems well recommended: https://www.fakenamegenerator.com/
+This was written for personal amusement and is admittedly of limited value. If you want something quicker/easier than cloning this project, this web service seems well recommended: https://www.fakenamegenerator.com/
+
+If you do find this project to be useful, submit an issue if you would like to see something added or changed.
 
 ## Usage
     usage: alias [-h] -a AGE [-f] [-m] [-n NUMBER]
