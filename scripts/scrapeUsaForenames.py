@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def getFornameDecade(url):
+def getForenameDecade(url):
     options = webdriver.ChromeOptions()
     options.headless = True
     with webdriver.Chrome(
@@ -27,11 +27,11 @@ def getFornameDecade(url):
     return tableData
 
 
-def writeFornameFile(year):
+def writeForenameFile(year):
     url = f"https://www.ssa.gov/OACT/babynames/decades/names{year}s.html"
     fileName = f"forenames_{year}s.csv"
     header = "rank,maleName,number,femaleName,number"
-    data = getFornameDecade(url)
+    data = getForenameDecade(url)
     with open(fileName, "w", encoding="UTF8") as f:
         f.write(f"{url}\n")
         f.write(f"{header}\n")
@@ -43,4 +43,4 @@ def writeFornameFile(year):
 
 
 for year in range(1880, 2020, 10):
-    writeFornameFile(year)
+    writeForenameFile(year)
