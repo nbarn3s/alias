@@ -58,3 +58,5 @@ These are some ideas for the next development tasks in order of likelihood.
     * Could use the state data when possible and then the USA-wide data to extend the range back before 1960
  * Support more of the data available (surnames by race, other nationalities, etc.).
  * The birthday generation assumes an equal probability for each day of the year.  This is a decent assumption, but https://www.panix.com/~murphy/bday.html has data for over 480k birthdays reduced in a way that a better distribution could be implemented here.
+ * Password generation would be useful, but there is also this: https://my.norton.com/extspa/passwordmanager?path=pwd-gen
+ 
