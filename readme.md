@@ -26,6 +26,9 @@ The home state probabilities are based on the US population estimates for 2019 f
 ### birthday
 This is a random day that would result in the requested age assuming birthdays are equally distributed   throughout the year. While this is not exactly true, it was deemed sufficient for this exercise. There is a TODO below with reference to data to make results better distributed.
 
+### education
+This is limited to a determination of when, given state laws (https://nces.ed.gov/programs/statereform/tab5_3.asp), the identity would have likely started kindergarten.  From that, a high school graduation date is given assuming not grades were failed or skipped.
+
 ## Usage
     usage: alias [-h] -a AGE [-f] [-m] [-n NUMBER]
 

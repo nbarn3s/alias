@@ -30,6 +30,8 @@ class Identity(object):
         self.surname = None
         self.mothersMaidenName = None
         self.homeState = None
+        self.kindergardenStartDate = None
+        self.highschoolGradDate = None
         self.rollIdentity()
 
     def printInfo(self):
@@ -53,6 +55,9 @@ class Identity(object):
             print(
                 f"\t{string.capwords(subjectivePronoun)} middle name is {self.middleName}."
             )
+        eduStr = f"\t{string.capwords(objectivePronoun)} started kindergarden in the fall of {self.kindergardenStartDate}"
+        eduStr += f" and graduated from high school in the spring of {self.highschoolGradDate}."
+        print(eduStr)
 
     def rollIdentity(self):
         self.birthday = rollBirthDay(self.age)
@@ -65,6 +70,9 @@ class Identity(object):
         while self.surname == self.mothersMaidenName:
             self.mothersMaidenName = rollSurname(self.nationality)
         self.homeState = rollState(self.nationality)
+        self.kindergardenStartDate, self.highschoolGradDate = rollEducation(
+            self.birthday, self.nationality, self.homeState
+        )
 
 
 def rollBirthDay(age):
@@ -236,3 +244,64 @@ def rollState(nationality):
             homeState = state
             break
     return homeState
+
+
+def rollEducation(birthday, nationality, state):
+    if nationality not in ("USA"):
+        raise ValueError("Only rollState only supports a nationality value of 'USA'")
+
+    filePath = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        f"data_{nationality}",
+        "kindergarden.csv",
+    )
+    if not os.path.isfile(filePath):
+        raise ValueError(f"The file: {filePath} does not exist.")
+
+    condition = None
+    conditionalDateStr = None
+    with open(filePath) as csv_file:
+        data = csv.reader(csv_file, delimiter=",", quotechar='"')
+        for line in data:
+            if len(line) < 3:
+                continue
+            if line[0] == state:
+                condition = line[1]
+                conditionalDateStr = line[2]
+                break
+
+    if condition in ("LEA", "N/A"):
+        # use most strict condition and date since it is more likely to be held back than to start early
+        # LEA stands for Local Educational Authority
+        condition = "5_before"
+        conditionalDateStr = "7/31"
+    elif condition in ("5"):
+        # only Vermont
+        # this reference suggests that New England schools typically start between Aug 26 and Aug 30
+        # https://www.pewresearch.org/fact-tank/2019/08/14/back-to-school-dates-u-s/
+        # use still most the strict condition and date since it is more likely to be held back than to start early
+        condition = "5_before"
+        conditionalDateStr = "7/31"
+
+    birthyearPlus5 = birthday.year + 5
+    conditionalMonth, conditionalDay = conditionalDateStr.split("/")
+    conditionalDate = datetime.date(
+        birthyearPlus5, int(conditionalMonth), int(conditionalDay)
+    )
+
+    kgCheck = datetime.date(birthyearPlus5, birthday.month, birthday.day)
+    if condition in ("5_on_or_before", "5_on"):
+        if conditionalDate >= kgCheck:
+            kindergardenStartYear = birthyearPlus5
+        else:
+            kindergardenStartYear = birthyearPlus5 + 1
+    elif condition in ("5_by", "5_prior_to", "5_before"):
+        if conditionalDate > kgCheck:
+            kindergardenStartYear = birthyearPlus5
+        else:
+            kindergardenStartYear = birthyearPlus5 + 1
+    else:
+        raise Exception("Unknown conditions for kindergarden start")
+    highSchoolGradYear = kindergardenStartYear + 13
+
+    return kindergardenStartYear, highSchoolGradYear
